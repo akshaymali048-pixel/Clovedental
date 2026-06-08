@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Lead {
+  id            String         @id @default(cuid())
+  name          String
+  phone         String
+  email         String?
+  service       String?
+  message       String?
+  preferredTime String?
+  status        LeadStatus     @default(NEW)
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  landingPage   String?
+  assignedTo    String?
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  activities    LeadActivity[]
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  BOOKED
+  VISITED
+  CLOSED
+  SPAM
+}
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  action    String
+  createdBy String
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model EventLog {
+  id        String   @id @default(cuid())
+  type      String
+  page      String?
+  leadId    String?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
+model ClinicSettings {
+  id            String   @id @default("singleton")
+  clinicName    String
+  phone         String
+  whatsapp      String?
+  address       String
+  googleMapsUrl String?
+  timings       Json
+  emailAlert    String?
+  updatedAt     DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  patientName String
+  treatment   String?
+  content     String
+  rating      Int      @default(5)
+  approved    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
