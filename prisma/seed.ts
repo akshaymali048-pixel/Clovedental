@@ -6,12 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.clinicSettings.upsert({
     where: { id: "singleton" },
-    update: {},
+    update: {
+      phone: "9192939495",
+      whatsapp: "9192939495",
+    },
     create: {
       id: "singleton",
       clinicName: "Clove Dental",
-      phone: "9393553232",
-      whatsapp: "9393553232",
+      phone: "9192939495",
+      whatsapp: "9192939495",
       address:
         "240/1, Shop No 112, 113, 114, 115, 116, 117, Laxmi Complex, Near Big Bazar, Mumbai Pune Road, Pimpri Colony, Pimpri Chinchwad, Pune",
       googleMapsUrl:
