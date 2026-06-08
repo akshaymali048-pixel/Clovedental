@@ -25,6 +25,16 @@ type FieldProps = InputFieldProps | TextareaFieldProps | SelectFieldProps;
 const fieldClasses =
   "w-full min-h-11 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-base text-[#1a1a2e] outline-none transition focus:border-[#0d6e6e] focus:ring-2 focus:ring-[#0d6e6e]/20";
 
+const shellKeys = ["as", "label", "name", "error", "className"] as const;
+
+function withoutShellProps(props: FieldProps): Record<string, unknown> {
+  const rest: Record<string, unknown> = { ...props };
+  for (const key of shellKeys) {
+    delete rest[key];
+  }
+  return rest;
+}
+
 function FieldWrapper({
   label,
   id,
@@ -54,8 +64,7 @@ export function Field(props: FieldProps) {
   const id = props.id ?? name;
 
   if (props.as === "textarea") {
-    const { as, label: _l, name: _n, error: _e, className: _c, ...rest } = props;
-    void as;
+    const rest = withoutShellProps(props);
 
     return (
       <FieldWrapper label={label} id={id} error={error} className={className}>
@@ -63,31 +72,39 @@ export function Field(props: FieldProps) {
           id={id}
           name={name}
           className={`${fieldClasses} min-h-28 resize-y`}
-          {...rest}
+          {...(rest as TextareaHTMLAttributes<HTMLTextAreaElement>)}
         />
       </FieldWrapper>
     );
   }
 
   if (props.as === "select") {
-    const { as, label: _l, name: _n, error: _e, className: _c, children, ...rest } = props;
-    void as;
+    const { children, ...rest } = withoutShellProps(props);
 
     return (
       <FieldWrapper label={label} id={id} error={error} className={className}>
-        <select id={id} name={name} className={fieldClasses} {...rest}>
-          {children}
+        <select
+          id={id}
+          name={name}
+          className={fieldClasses}
+          {...(rest as SelectHTMLAttributes<HTMLSelectElement>)}
+        >
+          {children as ReactNode}
         </select>
       </FieldWrapper>
     );
   }
 
-  const { as, label: _l, name: _n, error: _e, className: _c, ...rest } = props;
-  void as;
+  const rest = withoutShellProps(props);
 
   return (
     <FieldWrapper label={label} id={id} error={error} className={className}>
-      <input id={id} name={name} className={fieldClasses} {...rest} />
+      <input
+        id={id}
+        name={name}
+        className={fieldClasses}
+        {...(rest as InputHTMLAttributes<HTMLInputElement>)}
+      />
     </FieldWrapper>
   );
 }
