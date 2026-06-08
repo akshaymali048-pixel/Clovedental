@@ -274,6 +274,8 @@ See `.env.local.example` for the full list. Secrets stay in `.env.local` or your
 5. Run `npx prisma db push` against production Neon (or use Vercel build hook + `db:push` in CI)
 6. Seed admin user once: `npm run db:seed`
 
+The build runs `prisma generate` automatically (`postinstall` + `build` script) so Prisma Client is fresh on Vercel’s cached installs.
+
 ---
 
 ## Production architecture
