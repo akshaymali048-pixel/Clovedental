@@ -3,9 +3,28 @@ import type { Lead } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResend(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+
+  if (!resendClient) {
+    resendClient = new Resend(apiKey);
+  }
+
+  return resendClient;
+}
 
 export async function sendLeadAlert(lead: Lead): Promise<void> {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY not set — skipping lead email");
+    return;
+  }
+
   const settings = await prisma.clinicSettings.findUnique({
     where: { id: "singleton" },
   });
